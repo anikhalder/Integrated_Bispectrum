@@ -176,15 +176,17 @@ def draw_pt_on_circle(omega_1, theta_scale, patch_radius):
 
 def integrated_lognormal_3pt_corr_manual(theta_scale, patch_radius, log_shift, patch_area, N=10000):
     f = 0
+    accepted_points = 0
     for i in range(N):
         theta_1, phi_1 = draw_pt_within_patch(patch_radius)
         theta_2, phi_2 = draw_pt_within_patch(patch_radius)
         theta_3, phi_3 = draw_pt_on_circle([theta_1, phi_1], theta_scale, patch_radius)
 
         if (not np.isnan(theta_3)):
+            accepted_points += 1
             f += np.sin(theta_1)*np.sin(theta_2)*np.sin(theta_3)*lognormal_3pt_corr([theta_1, phi_1], [theta_2, phi_2], [theta_3, phi_3], log_shift)
 
-    return f / N / (patch_area**2)
+    return f / accepted_points / (patch_area**2)
 
 #######################################################################################################################################
 #######################################################################################################################################
@@ -240,12 +242,13 @@ theta_scale_log_vec = kk.logr # in log arcmins
 
 theta_scale_vec = np.exp(theta_scale_log_vec)
 i_Xi_vec = np.zeros(theta_scale_vec.size)
-for i in range(theta_scale_vec.size):
+for i in range(theta_scale_vec.size-3):
+    # the last 3 theta scales are bigger than the patch radius
     print('###############################################################################')
     print('Iteration #',str(i+1))
     start_iter = time.time()
     print('Theta (in arcmins): ', theta_scale_vec[i]) # weighted mean value of r for the pairs in each bin used by treecorr
-    i_Xi_vec[i] = integrated_lognormal_3pt_corr_manual(theta_scale_vec[i]*np.pi/180/60, t_patch_radius, log_shift, A_L, 1000000)
+    i_Xi_vec[i] = integrated_lognormal_3pt_corr_manual(theta_scale_vec[i]*np.pi/180/60, t_patch_radius, log_shift, A_L, 10000)
     print('i_Xi: ', i_Xi_vec[i])
     end_iter = time.time()
     print('Time taken for execution of iteration (seconds): ', end_iter - start_iter)
