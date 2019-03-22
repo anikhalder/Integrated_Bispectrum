@@ -7,7 +7,13 @@ from scipy import interpolate
 import treecorr
 import skinematics as skin
 
-t_patch_radius = 0.031 # size of patch (in radians)
+### Parameters to change according to patch size and count
+# Make 500 patches (discs) of 10 sq. degree pixels
+sq_degrees = 10
+patch_radius = 0.031 #rad
+patch_count = 500
+maps_count = 10
+
 log_shift = 1.0
 
 # as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
@@ -24,49 +30,54 @@ def read_cl():
 l , cl = read_cl()
 
 # Theoretical angular correlation function (using formula with Legendre polynomials)
-def w_theta(theta):
-    x = np.cos(theta)
+def w_cos_theta(cos_theta):
+    x = cos_theta
     coeff = (2*l+1)/(4*np.pi)*cl
     w = np.polynomial.legendre.legval(x, coeff)
     return w     
 
-def angular_length(omega_1, omega_2):
-    #return np.arccos( np.around( np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]), decimals=20) )
+def cos_angular_length(omega_1, omega_2):
+    
+    """
     if (np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]) > 1):
         return np.arccos(1)
     elif (np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]) < -1):
         return np.arccos(-1)
     else:
         return np.arccos( np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]) )
+    """
+
+    return np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1])
 
 def window_circular_patch(omega, omega_patch, patch_radius):
-    if (angular_length(omega, omega_patch) <= patch_radius):
+    if (np.arccos(cos_angular_length(omega, omega_patch)) <= patch_radius):
         return 1
     else:
         return 0
 
 def bin_angular_scale_interval(omega_1, omega_2, theta_scale_interval):
     # theta_scale_interval is a list containing the lower and upper values of the bin (used in TreeCorr) in regular distance space in radians
-    if (angular_length(omega_1, omega_2) >= theta_scale_interval[0] and angular_length(omega_1, omega_2) < theta_scale_interval[1]):
+    if (np.arccos(cos_angular_length(omega_1, omega_2)) >= theta_scale_interval[0] and np.arccos(cos_angular_length(omega_1, omega_2)) < theta_scale_interval[1]):
         return 1/(theta_scale_interval[1]-theta_scale_interval[0])
     else:
         return 0
 
-theta_arr = np.linspace(0,2*t_patch_radius+0.001,10000)
-w_theta_arr = w_theta(theta_arr)
+theta_arr = np.linspace(0,2*patch_radius+0.001,10000)
+cos_theta_arr = np.cos(theta_arr)
+w_cos_theta_arr = w_cos_theta(cos_theta_arr)
 
-w_theta_interp = interpolate.interp1d(theta_arr, w_theta_arr)
+w_cos_theta_interp = interpolate.interp1d(cos_theta_arr, w_cos_theta_arr)
     
 def lognormal_3pt_corr(omega_1, omega_2, omega_3, log_shift):
     # angular 3pt correlartion function for a lognormal density field (according to Hilbert et al.)
 
-    #w_12 = w_theta(angular_length(omega_1, omega_2))
-    #w_13 = w_theta(angular_length(omega_1, omega_3))
-    #w_23 = w_theta(angular_length(omega_2, omega_3))
+    #w_12 = w_cos_theta(cos_angular_length(omega_1, omega_2))
+    #w_13 = w_cos_theta(cos_angular_length(omega_1, omega_3))
+    #w_23 = w_cos_theta(cos_angular_length(omega_2, omega_3))
 
-    w_12 = w_theta_interp(angular_length(omega_1, omega_2))
-    w_13 = w_theta_interp(angular_length(omega_1, omega_3))
-    w_23 = w_theta_interp(angular_length(omega_2, omega_3))
+    w_12 = w_cos_theta_interp(cos_angular_length(omega_1, omega_2))
+    w_13 = w_cos_theta_interp(cos_angular_length(omega_1, omega_3))
+    w_23 = w_cos_theta_interp(cos_angular_length(omega_2, omega_3))
 
     return (log_shift**-1)*(w_12*w_13+w_12*w_23+w_13*w_23)+(log_shift**-3)*(w_12*w_13*w_23)
 
@@ -205,29 +216,29 @@ tL = [0.0, 0.0] # location of patch -> at the north pole
 
 t_scale = 0.003 # test scale we are interested (in radians)
 
-print("Angular length between t1 and t2 (in radians) = ", angular_length(t1, t2))
-print("Angular length between t1 and tL (in radians)  = ", angular_length(t1, tL))
-print("Angular length between t2 and tL (in radians)  = ", angular_length(t2, tL))
-print("Angular length between t3 and tL (in radians)  = ", angular_length(t3, tL))
-print("Angular length between t4 and t6 (in radians)  = ", angular_length(t4, t6))
-print("Angular length between t5 and t6 (in radians)  = ", angular_length(t5, t6))
+print("Angular length between t1 and t2 (in radians) = ", cos_angular_length(t1, t2))
+print("Angular length between t1 and tL (in radians)  = ", cos_angular_length(t1, tL))
+print("Angular length between t2 and tL (in radians)  = ", cos_angular_length(t2, tL))
+print("Angular length between t3 and tL (in radians)  = ", cos_angular_length(t3, tL))
+print("Angular length between t4 and t6 (in radians)  = ", cos_angular_length(t4, t6))
+print("Angular length between t5 and t6 (in radians)  = ", cos_angular_length(t5, t6))
 
-print("Is t1 within the patch which is centered at tL and is of size "+str(t_patch_radius)+" radians = ", window_circular_patch(t1, tL, t_patch_radius))
-print("Is t2 within the patch which is centered at tL and is of size "+str(t_patch_radius)+" radians = ", window_circular_patch(t2, tL, t_patch_radius))
-print("Is t7 within the patch which is centered at tL and is of size "+str(t_patch_radius)+" radians = ", window_circular_patch(t7, tL, t_patch_radius))
-print("Is t8 within the patch which is centered at tL and is of size "+str(t_patch_radius)+" radians = ", window_circular_patch(t8, tL, t_patch_radius))
+print("Is t1 within the patch which is centered at tL and is of size "+str(patch_radius)+" radians = ", window_circular_patch(t1, tL, patch_radius))
+print("Is t2 within the patch which is centered at tL and is of size "+str(patch_radius)+" radians = ", window_circular_patch(t2, tL, patch_radius))
+print("Is t7 within the patch which is centered at tL and is of size "+str(patch_radius)+" radians = ", window_circular_patch(t7, tL, patch_radius))
+print("Is t8 within the patch which is centered at tL and is of size "+str(patch_radius)+" radians = ", window_circular_patch(t8, tL, patch_radius))
 
 print("Is t1 and tL at approximately "+str(t_scale)+" radians separation =", bin_angular_scale_interval(t1, tL, [t_scale - 0.00001, t_scale + 0.00001]))
 
-print("Angular 2-pt correlation: w(theta between t1 and t2) = ", w_theta(angular_length(t1, t2)))
-print("Angular 2-pt correlation: w(theta between t4 and t6) = ", w_theta(angular_length(t4, t6)))
-print("Angular 2-pt correlation: w(theta between t5 and t6) = ", w_theta(angular_length(t5, t6)))
+print("Angular 2-pt correlation: w(theta between t1 and t2) = ", w_cos_theta(cos_angular_length(t1, t2)))
+print("Angular 2-pt correlation: w(theta between t4 and t6) = ", w_cos_theta(cos_angular_length(t4, t6)))
+print("Angular 2-pt correlation: w(theta between t5 and t6) = ", w_cos_theta(cos_angular_length(t5, t6)))
 
 print("\n #### Manual integration ###")
 
-A_L = area_patch(t_patch_radius)
+A_L = area_patch(patch_radius)
 print("Area of the patch = ", A_L)
-print("Integrated lognormal 3-pt function at angular scale "+str(t_scale)+" radians = ", integrated_lognormal_3pt_corr_manual(t_scale, t_patch_radius, log_shift, A_L))
+print("Integrated lognormal 3-pt function at angular scale "+str(t_scale)+" radians = ", integrated_lognormal_3pt_corr_manual(t_scale, patch_radius, log_shift, A_L))
 
 #######################################################################################################################################
 #######################################################################################################################################
@@ -248,7 +259,7 @@ for i in range(theta_scale_vec.size-3):
     print('Iteration #',str(i+1))
     start_iter = time.time()
     print('Theta (in arcmins): ', theta_scale_vec[i]) # weighted mean value of r for the pairs in each bin used by treecorr
-    i_Xi_vec[i] = integrated_lognormal_3pt_corr_manual(theta_scale_vec[i]*np.pi/180/60, t_patch_radius, log_shift, A_L, 10000)
+    i_Xi_vec[i] = integrated_lognormal_3pt_corr_manual(theta_scale_vec[i]*np.pi/180/60, patch_radius, log_shift, A_L, 100000)
     print('i_Xi: ', i_Xi_vec[i])
     end_iter = time.time()
     print('Time taken for execution of iteration (seconds): ', end_iter - start_iter)
@@ -256,10 +267,13 @@ for i in range(theta_scale_vec.size-3):
 dat = np.array([theta_scale_vec, i_Xi_vec])
 
 dat = dat.T
-np.savetxt('i_Xi_theoretical_lognormal_patch_10_sq_degrees.txt', dat, delimiter = ' ')    
+np.savetxt('i_Xi_theoretical_lognormal_patch_'+str(sq_degrees)+'_sq_degrees.txt', dat, delimiter = ' ')    
 
-theta_scale_vec = np.loadtxt('i_Xi_theoretical_lognormal_patch_10_sq_degrees.txt', usecols=(0)) # in arcmins
-i_Xi_vec = np.loadtxt('i_Xi_theoretical_lognormal_patch_10_sq_degrees.txt', usecols=(1))
+####################################
+# Theoretical i_Xi plot
+####################################
+theta_scale_vec = np.loadtxt('i_Xi_theoretical_lognormal_patch_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(0)) # in arcmins
+i_Xi_vec = np.loadtxt('i_Xi_theoretical_lognormal_patch_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
 plt.figure(figsize=(9,9))
 plt.plot(theta_scale_vec, i_Xi_vec, c='r', label='theoretical i_Xi(theta)')
 plt.xlim(1,400)
@@ -270,9 +284,47 @@ plt.xscale('log')
 plt.axhline(0, linestyle='dashed')
 plt.xlabel('Angle, theta (arcmins)', fontsize=14)
 plt.ylabel('Integrated 3-pt function, i_Xi', fontsize=14)
-plt.title('Integrated 3-pt function of lognormal field (10 sq degrees patch)')
+plt.title('Integrated 3-pt function of lognormal field ('+str(sq_degrees)+' sq degrees patch)')
 plt.legend(fontsize=13)
-plt.savefig('i_Xi_lognormal_theoretical_patch_10_sq_degrees.pdf')
+plt.savefig('i_Xi_theoretical_lognormal_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
+
+####################################
+# Theoretical & simulations i_Xi plot
+####################################
+theta_mean_all_maps_vec = np.loadtxt('i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(0)) # in arcmins
+i_Xi_mean_all_maps_vec = np.loadtxt('i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
+i_Xi_std_dev_all_maps_vec = np.loadtxt('i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(2))
+i_Xi_std_dev_mean_all_maps_vec = np.loadtxt('i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(3))
+
+
+plt.figure(figsize=(9,9))
+plt.plot(theta_scale_vec, i_Xi_vec, c='r', label='theoretical i_Xi(theta)')
+plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_all_maps_vec, marker=10, label='i_Xi - one map error')
+plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_mean_all_maps_vec, marker=10, color='k', label='i_Xi - mean error')
+plt.xlim(1,400)
+#plt.ylim(1e-6, 1e-1)
+#plt.ylim(-0.005, 0.015)
+plt.xscale('log')
+#plt.yscale('log')
+plt.axhline(0, linestyle='dashed')
+plt.xlabel('Angle, theta (arcmins)', fontsize=14)
+plt.ylabel('Integrated 3-pt function, i_Xi', fontsize=14)
+plt.title('Integrated 3-pt function of lognormal field ('+str(sq_degrees)+' sq degrees patch)')
+plt.legend(fontsize=13)
+plt.savefig('i_Xi_lognormal_theoretical_simulations_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
+
+####################################
+# Ratio plot
+####################################
+plt.figure(figsize=(9,9))
+plt.scatter(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec/i_Xi_vec)
+plt.ylim(0,10)
+plt.xscale('log')
+plt.axhline(2, linestyle='dashed')
+plt.xlabel('Angle, theta (arcmins)', fontsize=14)
+plt.ylabel('Ratio', fontsize=14)
+plt.title('Ratio of simulatiion and theoretical i_Xi ('+str(sq_degrees)+' sq degrees patch)')
+plt.savefig('i_Xi_lognormal_ratio_simulations_theoretical_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
 
 
 end_program = time.time()
