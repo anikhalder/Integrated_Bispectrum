@@ -45,7 +45,7 @@ else:
 
 ################################################################
 log_shift = 1.0 # log shift parameter
-N = 10000 # number of evaluations for the integral
+N = 1000000 # number of evaluations for the integral
 ################################################################
 
 # as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
