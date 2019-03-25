@@ -20,7 +20,7 @@ if (sys.argv[1] == str(250)):
     sq_degrees = 250
     patch_radius = 0.155 #rad
     patch_count = 20
-    filepath = '../output/250_sq_degrees_20_patches/'
+    filepath = '../simulations_output/250_sq_degrees_20_patches/'
     maps_count = 10
 
 elif (sys.argv[1] == str(50)):
@@ -29,7 +29,7 @@ elif (sys.argv[1] == str(50)):
     sq_degrees = 50
     patch_radius = 0.069 #rad
     patch_count = 100
-    filepath = '../output/50_sq_degrees_100_patches/'
+    filepath = '../simulations_output/50_sq_degrees_100_patches/'
     maps_count = 10
 
 elif (sys.argv[1] == str(10)):
@@ -38,21 +38,21 @@ elif (sys.argv[1] == str(10)):
     sq_degrees = 10
     patch_radius = 0.031 #rad
     patch_count = 500
-    filepath = '../output/10_sq_degrees_500_patches/'
+    filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
 else:
 	raise Exception('Choose correct patch size!')
 
 
-hdul = fits.open('../output/gaussian_maps/gaussian_map_'+str(1)+'.fits')
+hdul = fits.open('../simulations_output/gaussian_maps/gaussian_map_'+str(1)+'.fits')
 NSIDE = hdul[1].header['NSIDE']
 hdul.close
 
 # Loop through the maps
 for j in range(maps_count):
     #print('gaussian Map # ',str(j+1))
-    density_field_gaussian = hp.fitsfunc.read_map('../output/gaussian_maps/gaussian_map_'+str(j+1)+'.fits')
+    density_field_gaussian = hp.fitsfunc.read_map('../simulations_output/gaussian_maps/gaussian_map_'+str(j+1)+'.fits')
 
     filepath_map = filepath+'gaussian_map_'+str(j+1)+'/'
     createFolder(filepath_map+'A_healpy_patches_produced/')

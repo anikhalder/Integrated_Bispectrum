@@ -33,13 +33,13 @@ cl = np.append(np.array([0.0,0.0]), cl[:8191])
 
 maps_count = 10
 NSIDE = 4096
-createFolder('../output/gaussian_maps/')
-#filepath = './output/50_sq_degrees_100_patches/'
+createFolder('../simulations_output/gaussian_maps/')
+#filepath = './simulations_output/50_sq_degrees_100_patches/'
 
 for j in range(maps_count):    
     print('Gaussian Map # ',str(j+1))
     density_field_gaussian = hp.synfast(cl, NSIDE)
-    hp.write_map("./output/gaussian_maps/gaussian_map_"+str(j+1)+".fits", density_field_gaussian, overwrite='true')
+    hp.write_map("./simulations_output/gaussian_maps/gaussian_map_"+str(j+1)+".fits", density_field_gaussian, overwrite='true')
     #createFolder(filepath+'gaussian_map_'+str(j+1)+'/')
 
 end = time.time()

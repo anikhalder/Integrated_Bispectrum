@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir ../output/lognormal_maps
+mkdir ../simulations_output/lognormal_maps
 
 counter=1
 maps_count=10
@@ -8,7 +8,7 @@ maps_count=10
 while [ $counter -le $maps_count ]
 do
     flask flask_lognormal.config
-    mv ./output/lognormal_maps/map-f1z1.fits ./output/lognormal_maps/lognormal_map_$counter.fits 
+    mv ../simulations_output/lognormal_maps/map-f1z1.fits ../simulations_output/lognormal_maps/lognormal_map_$counter.fits 
     ((counter++))
 done
 
