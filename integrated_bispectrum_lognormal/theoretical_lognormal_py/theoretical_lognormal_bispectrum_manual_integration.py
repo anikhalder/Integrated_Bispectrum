@@ -17,35 +17,46 @@ if (sys.argv[1] == str(250)):
     ### Parameters to change according to patch size and count
     # Make 20 patches (discs) of 250 sq. degree pixels
     sq_degrees = 250
-    patch_radius = 0.155 #rad
+    #patch_radius = 0.155 #rad
     patch_count = 20
-    filepath = '../output/250_sq_degrees_20_patches/'
+    #filepath = '../simulations_output/250_sq_degrees_20_patches/'
     maps_count = 10
 
 elif (sys.argv[1] == str(50)):
     ### Parameters to change according to patch size and count
     # Make 100 patches (discs) of 50 sq. degree pixels
     sq_degrees = 50
-    patch_radius = 0.069 #rad
+    #patch_radius = 0.069 #rad
     patch_count = 100
-    filepath = '../output/50_sq_degrees_100_patches/'
+    #filepath = '../simulations_output/50_sq_degrees_100_patches/'
     maps_count = 10
 
 elif (sys.argv[1] == str(10)):
     ### Parameters to change according to patch size and count
     # Make 500 patches (discs) of 10 sq. degree pixels
     sq_degrees = 10
-    patch_radius = 0.031 #rad
+    #patch_radius = 0.031 #rad
     patch_count = 500
-    filepath = '../output/10_sq_degrees_500_patches/'
+    #filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
 else:
 	raise Exception('Choose correct patch size!')
 
+def calculate_patch_radius(patch_area_sq_degrees):
+    return np.arccos(1-patch_area_sq_degrees*np.pi/(2*180*180))
+
+def calculate_patch_area(patch_radius): 
+    # patch is basically a spherical cap centered around the North Pole on a sphere of unit radius
+    r = 1
+    return 2*np.pi*r*r*(1-np.cos(patch_radius)) # from Wikipedia
+
+patch_radius = calculate_patch_radius(float(sys.argv[1]))
+filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/'
+
 ################################################################
 log_shift = 1.0 # log shift parameter
-N = 1000000 # number of evaluations for the integral
+N = 10000 # number of evaluations for the integral
 ################################################################
 
 # as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
@@ -69,17 +80,7 @@ def w_cos_theta(cos_theta):
     return w     
 
 def cos_angular_length(omega_1, omega_2):
-    
-    """
-    if (np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]) > 1):
-        return np.arccos(1)
-    elif (np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]) < -1):
-        return np.arccos(-1)
-    else:
-        return np.arccos( np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1]) )
-    """
-
-    return np.cos(omega_1[0])*np.cos(omega_2[0]) +  np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1])
+    return np.cos(omega_1[0])*np.cos(omega_2[0]) + np.sin(omega_1[0])*np.sin(omega_2[0])*np.cos(omega_1[1]-omega_2[1])
 
 def window_circular_patch(omega, omega_patch, patch_radius):
     if (np.arccos(cos_angular_length(omega, omega_patch)) <= patch_radius):
@@ -103,20 +104,11 @@ w_cos_theta_interp = interpolate.interp1d(cos_theta_arr, w_cos_theta_arr)
 def lognormal_3pt_corr(omega_1, omega_2, omega_3, log_shift):
     # angular 3pt correlartion function for a lognormal density field (according to Hilbert et al.)
 
-    #w_12 = w_cos_theta(cos_angular_length(omega_1, omega_2))
-    #w_13 = w_cos_theta(cos_angular_length(omega_1, omega_3))
-    #w_23 = w_cos_theta(cos_angular_length(omega_2, omega_3))
-
     w_12 = w_cos_theta_interp(cos_angular_length(omega_1, omega_2))
     w_13 = w_cos_theta_interp(cos_angular_length(omega_1, omega_3))
     w_23 = w_cos_theta_interp(cos_angular_length(omega_2, omega_3))
 
-    return (log_shift**-1)*(w_12*w_13+w_12*w_23+w_13*w_23)+(log_shift**-3)*(w_12*w_13*w_23)
-
-def area_patch(patch_radius): 
-    # patch is basically a spherical cap centered around the North Pole one a sphere of unit radius
-    r = 1
-    return 2*np.pi*r*r*(1-np.cos(patch_radius)) # from Wikipedia
+    return (log_shift**(-1))*(w_12*w_13+w_12*w_23+w_13*w_23)+(log_shift**(-3))*(w_12*w_13*w_23)
 
 ##########################
 ### Manual integration ###
@@ -180,13 +172,31 @@ def rotate_vector_to_NP_matrices(P_sph, P_sph_units):
        
     return np.array([Rot_z, Rot_y]) # 1st rotation matrix and then 2nd rotation matrix
 
-def draw_pt_within_patch(patch_radius):
-    theta = np.random.uniform(0, patch_radius, 1)[0]
-    phi =  np.random.uniform(0, 2*np.pi, 1)[0]
+def draw_pt_within_patch(patch_radius, patch_area):
+
+    #theta = np.random.uniform(0, patch_radius, 1)[0]
+    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
+
+    #theta = np.clip(np.random.normal(patch_radius/2, patch_radius/6, 1)[0], 0, patch_radius)
+    
+    # random point in the patch using the ideology behind picking a point uniformly on a unit sphere from http://corysimon.github.io/articles/uniformdistn-on-sphere/
+    theta = np.arccos(1-patch_area*np.random.uniform(0, 1, 1)[0]/(2*np.pi))
+
+    # for 10 sq degrees
+    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
+    #phi =  np.clip(np.random.normal(np.pi, np.pi/2, 1)[0], 0, 2*np.pi)
+
+    # for 50 sq degrees
+    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
+    #phi =  np.clip(np.random.normal(np.pi, np.pi/5, 1)[0], 0, 2*np.pi)
+
+    # for 250 sq degrees
+    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
+    phi =  np.clip(np.random.normal(np.pi, np.pi/8, 1)[0], 0, 2*np.pi)
     
     return [theta, phi]
 
-def draw_pt_on_circle(omega_1, theta_scale, patch_radius):
+def draw_pt_on_circle_within_patch(omega_1, theta_scale, patch_radius):
     R_1, R_2 = rotate_vector_to_NP_matrices([1, omega_1[0], omega_1[1]], 'rad')
     
     theta_2_prime = theta_scale # polar angle in the rotated frame
@@ -209,7 +219,7 @@ def draw_pt_on_circle(omega_1, theta_scale, patch_radius):
     
     omega_2_3d_sph = np.zeros(3)
     phi_2_prime = np.random.uniform(0, 2*np.pi, 1)[0]
-    omega_2_prime_cart = spherical_to_cartesian([1, theta_2_prime, phi_2_prime], 'rad')
+    omega_2_prime_cart = spherical_to_cartesian([1, theta_2_prime, phi_2_prime], 'rad') # set radius of sphere to 1
     omega_2_3d_sph = cartesian_to_spherical(np.matmul(R_1.T, np.matmul(R_2.T, omega_2_prime_cart)), 'rad')
 
     if (omega_2_3d_sph[1] > patch_radius):
@@ -221,9 +231,15 @@ def integrated_lognormal_3pt_corr_manual(theta_scale, patch_radius, log_shift, p
     f = 0
     accepted_points = 0
     for i in range(N):
-        theta_1, phi_1 = draw_pt_within_patch(patch_radius)
-        theta_2, phi_2 = draw_pt_within_patch(patch_radius)
-        theta_3, phi_3 = draw_pt_on_circle([theta_1, phi_1], theta_scale, patch_radius)
+        theta_1, phi_1 = draw_pt_within_patch(patch_radius, patch_area)
+        theta_2, phi_2 = draw_pt_within_patch(patch_radius, patch_area)
+        theta_3, phi_3 = draw_pt_on_circle_within_patch([theta_1, phi_1], theta_scale, patch_radius)
+
+        """
+        # Test to check whether the angular separation between 1st and 3rd points are indeed theta_scale
+        if (np.arccos(cos_angular_length([theta_1, phi_1], [theta_3, phi_3])) != theta_scale):
+            print("3rd point - 1st point = ", np.arccos(cos_angular_length([theta_1, phi_1], [theta_3, phi_3])) - theta_scale)
+        """
 
         if (not np.isnan(theta_3)):
             accepted_points += 1
@@ -268,7 +284,7 @@ print("Angular 2-pt correlation: w(theta between t5 and t6) = ", w_cos_theta(cos
 
 print("\n #### Manual integration ###")
 
-A_L = area_patch(patch_radius)
+A_L = calculate_patch_area(patch_radius)
 print("Area of the patch = ", A_L)
 print("Integrated lognormal 3-pt function at angular scale "+str(t_scale)+" radians = ", integrated_lognormal_3pt_corr_manual(t_scale, patch_radius, log_shift, A_L))
 
@@ -312,7 +328,7 @@ plt.figure(figsize=(9,9))
 plt.plot(theta_scale_vec, i_Xi_vec, c='r', label='theoretical i_Xi(theta)')
 plt.xlim(1,400)
 #plt.ylim(1e-6, 1e-1)
-#plt.ylim(-0.005, 0.015)
+plt.ylim(-0.001, 0.02)
 plt.xscale('log')
 #plt.yscale('log')
 plt.axhline(0, linestyle='dashed')
@@ -337,7 +353,7 @@ plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_
 plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_mean_all_maps_vec, marker=10, color='k', label='i_Xi - mean error')
 plt.xlim(1,400)
 #plt.ylim(1e-6, 1e-1)
-#plt.ylim(-0.005, 0.015)
+plt.ylim(-0.001, 0.02)
 plt.xscale('log')
 #plt.yscale('log')
 plt.axhline(0, linestyle='dashed')
@@ -352,12 +368,13 @@ plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_Xi_lognormal_theoretic
 ####################################
 plt.figure(figsize=(9,9))
 plt.scatter(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec/i_Xi_vec)
-plt.ylim(0,10)
+plt.xlim(1,400)
+plt.ylim(0,5)
 plt.xscale('log')
-plt.axhline(2, linestyle='dashed')
+plt.axhline(1, linestyle='dashed')
 plt.xlabel('Angle, theta (arcmins)', fontsize=14)
 plt.ylabel('Ratio', fontsize=14)
-plt.title('Ratio of simulatiion and theoretical i_Xi ('+str(sq_degrees)+' sq degrees patch) \n # of evaluations = '+str(N))
+plt.title('Ratio of simulation and theoretical i_Xi ('+str(sq_degrees)+' sq degrees patch) \n # of evaluations = '+str(N))
 plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_Xi_lognormal_ratio_simulations_theoretical_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
 
 
