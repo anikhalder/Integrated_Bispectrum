@@ -15,31 +15,44 @@ if (sys.argv[1] == str(250)):
     ### Parameters to change according to patch size and count
     # Make 20 patches (discs) of 250 sq. degree pixels
     sq_degrees = 250
-    patch_radius = 0.155 #rad
+    #patch_radius = 0.155 #rad
     patch_count = 20
-    filepath = '../simulations_output/250_sq_degrees_20_patches/'
+    #filepath = '../simulations_output/250_sq_degrees_20_patches/'
     maps_count = 10
 
 elif (sys.argv[1] == str(50)):
     ### Parameters to change according to patch size and count
     # Make 100 patches (discs) of 50 sq. degree pixels
     sq_degrees = 50
-    patch_radius = 0.069 #rad
+    #patch_radius = 0.069 #rad
     patch_count = 100
-    filepath = '../simulations_output/50_sq_degrees_100_patches/'
+    #filepath = '../simulations_output/50_sq_degrees_100_patches/'
     maps_count = 10
 
 elif (sys.argv[1] == str(10)):
     ### Parameters to change according to patch size and count
     # Make 500 patches (discs) of 10 sq. degree pixels
     sq_degrees = 10
-    patch_radius = 0.031 #rad
+    #patch_radius = 0.031 #rad
     patch_count = 500
-    filepath = '../simulations_output/10_sq_degrees_500_patches/'
+    #filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
 else:
 	raise Exception('Choose correct patch size!')
+
+def calculate_patch_radius(patch_area_sq_degrees):
+    return np.arccos(1-patch_area_sq_degrees*np.pi/(2*180*180))
+
+def calculate_patch_area(patch_radius): 
+    # patch is basically a spherical cap centered around the North Pole on a sphere of unit radius
+    r = 1
+    return 2*np.pi*r*r*(1-np.cos(patch_radius)) # from Wikipedia
+
+patch_radius = calculate_patch_radius(float(sys.argv[1]))
+filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/'
+
+################################################################
 
 ## TreeCorr
 # for auto-correlation of the lognormal density fluctuations
