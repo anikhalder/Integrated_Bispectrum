@@ -40,6 +40,15 @@ elif (sys.argv[1] == str(10)):
     #filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
+elif (sys.argv[1] == str(5)):
+    ### Parameters to change according to patch size and count
+    # Make 1000 patches (discs) of 5 sq. degree pixels
+    sq_degrees = 5
+    #patch_radius = 0.022 #rad
+    patch_count = 1000
+    #filepath = '../simulations_output/5_sq_degrees_1000_patches/'
+    maps_count = 10
+    
 else:
 	raise Exception('Choose correct patch size!')
 
@@ -56,7 +65,7 @@ filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_cou
 
 ################################################################
 log_shift = 1.0 # log shift parameter
-N = 10000 # number of evaluations for the integral
+N = 100000 # number of evaluations for the integral
 ################################################################
 
 # as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
@@ -174,48 +183,19 @@ def rotate_vector_to_NP_matrices(P_sph, P_sph_units):
 
 def draw_pt_within_patch(patch_radius, patch_area):
 
-    #theta = np.random.uniform(0, patch_radius, 1)[0]
-    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
-
-    #theta = np.clip(np.random.normal(patch_radius/2, patch_radius/6, 1)[0], 0, patch_radius)
+    theta = np.random.uniform(0, patch_radius, 1)[0]
+    phi = np.random.uniform(0, 2*np.pi, 1)[0]
     
     # random point in the patch using the ideology behind picking a point uniformly on a unit sphere from http://corysimon.github.io/articles/uniformdistn-on-sphere/
-    theta = np.arccos(1-patch_area*np.random.uniform(0, 1, 1)[0]/(2*np.pi))
+    #theta = np.arccos(1-patch_area*np.random.uniform(0, 1, 1)[0]/(2*np.pi)) # Anik transformation
+    #theta = np.arccos(np.cos(patch_radius)+patch_area*np.random.uniform(0, 1, 1)[0]/(2*np.pi)) # Oliver transformation
 
-    # for 10 sq degrees
-    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
-    #phi =  np.clip(np.random.normal(np.pi, np.pi/2, 1)[0], 0, 2*np.pi)
-
-    # for 50 sq degrees
-    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
-    #phi =  np.clip(np.random.normal(np.pi, np.pi/5, 1)[0], 0, 2*np.pi)
-
-    # for 250 sq degrees
-    #phi = np.random.uniform(0, 2*np.pi, 1)[0]
-    phi =  np.clip(np.random.normal(np.pi, np.pi/8, 1)[0], 0, 2*np.pi)
-    
     return [theta, phi]
 
 def draw_pt_on_circle_within_patch(omega_1, theta_scale, patch_radius):
     R_1, R_2 = rotate_vector_to_NP_matrices([1, omega_1[0], omega_1[1]], 'rad')
     
     theta_2_prime = theta_scale # polar angle in the rotated frame
-    
-    """
-    do_iteration = True
-    
-    omega_2_3d_sph = np.zeros(3)
-    while(do_iteration):
-        phi_2_prime = np.random.uniform(0, 2*np.pi, 1)[0]
-        omega_2_prime_cart = spherical_to_cartesian([1, theta_2_prime, phi_2_prime], 'rad')
-        omega_2_3d_sph = cartesian_to_spherical(np.matmul(R_1.T, np.matmul(R_2.T, omega_2_prime_cart)), 'rad')
-
-        if (omega_2_3d_sph[1] < patch_radius):
-            do_iteration = False
-            
-    omega_2 = [omega_2_3d_sph[1], omega_2_3d_sph[2]]
-    return omega_2
-    """
     
     omega_2_3d_sph = np.zeros(3)
     phi_2_prime = np.random.uniform(0, 2*np.pi, 1)[0]
@@ -235,17 +215,19 @@ def integrated_lognormal_3pt_corr_manual(theta_scale, patch_radius, log_shift, p
         theta_2, phi_2 = draw_pt_within_patch(patch_radius, patch_area)
         theta_3, phi_3 = draw_pt_on_circle_within_patch([theta_1, phi_1], theta_scale, patch_radius)
 
-        """
-        # Test to check whether the angular separation between 1st and 3rd points are indeed theta_scale
-        if (np.arccos(cos_angular_length([theta_1, phi_1], [theta_3, phi_3])) != theta_scale):
-            print("3rd point - 1st point = ", np.arccos(cos_angular_length([theta_1, phi_1], [theta_3, phi_3])) - theta_scale)
-        """
-
         if (not np.isnan(theta_3)):
             accepted_points += 1
-            f += np.sin(theta_1)*np.sin(theta_2)*np.sin(theta_3)*lognormal_3pt_corr([theta_1, phi_1], [theta_2, phi_2], [theta_3, phi_3], log_shift)
+            # using uniform theta and uniform phi in draw_pt_within_patch()       
+            f += np.sin(theta_1)*np.sin(theta_2)*lognormal_3pt_corr([theta_1, phi_1], [theta_2, phi_2], [theta_3, phi_3], log_shift)
 
-    return f / accepted_points / (patch_area**2)
+            # using transformed theta and uniform phi in draw_pt_within_patch()          
+            #f += lognormal_3pt_corr([theta_1, phi_1], [theta_2, phi_2], [theta_3, phi_3], log_shift)
+
+    # using uniform theta and uniform phi in draw_pt_within_patch()     
+    return f / accepted_points * (2*np.pi*patch_radius/patch_area)**2
+
+    # using transformed theta and uniform phi in draw_pt_within_patch()
+    #return f / accepted_points
 
 #######################################################################################################################################
 #######################################################################################################################################
@@ -301,14 +283,14 @@ theta_scale_log_vec = kk.logr # in log arcmins
 
 createFolder(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/')
 
-theta_scale_vec = np.exp(theta_scale_log_vec)
+theta_scale_vec = np.exp(theta_scale_log_vec) # in arcmins
 i_Xi_vec = np.zeros(theta_scale_vec.size)
-for i in range(theta_scale_vec.size-3):
-    # the last 3 theta scales are bigger than the patch radius
+for i in range(theta_scale_vec.size-5):
+    # the last 3/5 theta scales are bigger than the patch radius for 10/5 sq degrees
     print('###############################################################################')
     print('Iteration #',str(i+1))
     start_iter = time.time()
-    print('Theta (in arcmins): ', theta_scale_vec[i]) # weighted mean value of r for the pairs in each bin used by treecorr
+    print('Theta (in arcmins): ', theta_scale_vec[i]) # nominal center of the bin used by treecorr
     i_Xi_vec[i] = integrated_lognormal_3pt_corr_manual(theta_scale_vec[i]*np.pi/180/60, patch_radius, log_shift, A_L, N)
     print('i_Xi: ', i_Xi_vec[i])
     end_iter = time.time()
