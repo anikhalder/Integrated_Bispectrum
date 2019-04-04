@@ -41,6 +41,15 @@ elif (sys.argv[1] == str(10)):
     #filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
+elif (sys.argv[1] == str(5)):
+    ### Parameters to change according to patch size and count
+    # Make 1000 patches (discs) of 5 sq. degree pixels
+    sq_degrees = 5
+    #patch_radius = 0.022 #rad
+    patch_count = 1000
+    #filepath = '../simulations_output/5_sq_degrees_1000_patches/'
+    maps_count = 10
+
 else:
 	raise Exception('Choose correct patch size!')
 

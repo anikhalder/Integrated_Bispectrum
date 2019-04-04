@@ -37,6 +37,15 @@ elif (sys.argv[1] == str(10)):
     #filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
+elif (sys.argv[1] == str(5)):
+    ### Parameters to change according to patch size and count
+    # Make 1000 patches (discs) of 5 sq. degree pixels
+    sq_degrees = 5
+    #patch_radius = 0.022 #rad
+    patch_count = 1000
+    #filepath = '../simulations_output/5_sq_degrees_1000_patches/'
+    maps_count = 10
+    
 else:
 	raise Exception('Choose correct patch size!')
 
@@ -111,7 +120,7 @@ for j in range(maps_count):
     i_Xi_mean_one_map_vec = i_Xi_mean_one_map_vec/patch_count - mean_del_g_mean_one_map_vec/patch_count * xi_mean_one_map_vec/patch_count # for smaller errors
 
     # plot i_Xi of each map as a scatter plot
-    #plt.scatter(theta_mean_one_map_vec, i_Xi_mean_one_map_vec)
+    plt.scatter(theta_mean_one_map_vec, i_Xi_mean_one_map_vec)
 
     theta_mean_all_maps_vec = theta_mean_all_maps_vec +theta_mean_one_map_vec
     i_Xi_mean_all_maps_vec = i_Xi_mean_all_maps_vec + i_Xi_mean_one_map_vec
