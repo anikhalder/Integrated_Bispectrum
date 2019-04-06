@@ -38,6 +38,15 @@ elif (sys.argv[1] == str(10)):
     #filepath = '../simulations_output/10_sq_degrees_500_patches/'
     maps_count = 10
 
+elif (sys.argv[1] == str(5)):
+    ### Parameters to change according to patch size and count
+    # Make 1000 patches (discs) of 5 sq. degree pixels
+    sq_degrees = 5
+    #patch_radius = 0.022 #rad
+    patch_count = 1000
+    #filepath = '../simulations_output/5_sq_degrees_1000_patches/'
+    maps_count = 10
+
 else:
 	raise Exception('Choose correct patch size!')
 
@@ -77,7 +86,7 @@ for j in range(maps_count):
         cat = treecorr.Catalog(ra=density_fluctuations_RA, dec=density_fluctuations_dec,
                                 ra_units='rad', dec_units='rad', k=density_fluctuations_del_g)
 
-        kk = treecorr.KKCorrelation(min_sep=1, max_sep=400, nbins=30, sep_units='arcmin')
+        kk = treecorr.KKCorrelation(min_sep=1, max_sep=150, nbins=30, sep_units='arcmin')
         kk.process(cat) 
         theta_tc = kk.meanr # tc stands for treecorr
         xi_tc = kk.xi
