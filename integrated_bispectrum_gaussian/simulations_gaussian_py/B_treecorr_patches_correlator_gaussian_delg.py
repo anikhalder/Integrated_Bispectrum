@@ -86,7 +86,7 @@ for j in range(maps_count):
         cat = treecorr.Catalog(ra=density_fluctuations_RA, dec=density_fluctuations_dec,
                                 ra_units='rad', dec_units='rad', k=density_fluctuations_del_g)
 
-        kk = treecorr.KKCorrelation(min_sep=1, max_sep=150, nbins=30, sep_units='arcmin')
+        kk = treecorr.KKCorrelation(min_sep=1, max_sep=150, nbins=15, sep_units='arcmin')
         kk.process(cat) 
         theta_tc = kk.meanr # tc stands for treecorr
         xi_tc = kk.xi

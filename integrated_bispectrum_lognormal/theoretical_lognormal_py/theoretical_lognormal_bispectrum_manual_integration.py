@@ -65,7 +65,7 @@ filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_cou
 
 ################################################################
 log_shift = 1.0 # log shift parameter
-N = 100000 # number of evaluations for the integral
+N = 10000 # number of evaluations for the integral
 ################################################################
 
 # as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
@@ -75,8 +75,10 @@ N = 100000 # number of evaluations for the integral
 def read_cl():
     l = np.loadtxt('../data/Cell_data-f1z1f1z1.dat', usecols=(0))
     l = np.append(np.array([0.0,1.0]), l[:8191])
+    #l = np.append(np.array([0.0,1.0]), l)
     cl = np.loadtxt('../data/Cell_data-f1z1f1z1.dat', usecols=(1))
     cl = np.append(np.array([0.0,0.0]), cl[:8191])
+    #cl = np.append(np.array([0.0,0.0]), cl)
     return l, cl
 
 l , cl = read_cl()
@@ -274,7 +276,7 @@ print("Integrated lognormal 3-pt function at angular scale "+str(t_scale)+" radi
 #######################################################################################################################################
 # Evaluate the integrated bispectrum (for lognormal density field) for given scale angles
 
-kk = treecorr.KKCorrelation(min_sep=1, max_sep=400, nbins=30, sep_units='arcmin')
+kk = treecorr.KKCorrelation(min_sep=1, max_sep=150, nbins=15, sep_units='arcmin')
 theta_scale_log_vec = kk.logr # in log arcmins
 
 ##########################
@@ -285,7 +287,7 @@ createFolder(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/')
 
 theta_scale_vec = np.exp(theta_scale_log_vec) # in arcmins
 i_Xi_vec = np.zeros(theta_scale_vec.size)
-for i in range(theta_scale_vec.size-5):
+for i in range(theta_scale_vec.size):
     # the last 3/5 theta scales are bigger than the patch radius for 10/5 sq degrees
     print('###############################################################################')
     print('Iteration #',str(i+1))
@@ -308,7 +310,7 @@ theta_scale_vec = np.loadtxt(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_Xi_th
 i_Xi_vec = np.loadtxt(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_Xi_theoretical_lognormal_patch_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
 plt.figure(figsize=(9,9))
 plt.plot(theta_scale_vec, i_Xi_vec, c='r', label='theoretical i_Xi(theta)')
-plt.xlim(1,400)
+plt.xlim(1,150)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
 plt.xscale('log')
@@ -323,17 +325,17 @@ plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_Xi_theoretical_lognorm
 ####################################
 # Theoretical & simulations i_Xi plot
 ####################################
-theta_mean_all_maps_vec = np.loadtxt(str(sq_degrees)+'_sq_degrees/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(0)) # in arcmins
-i_Xi_mean_all_maps_vec = np.loadtxt(str(sq_degrees)+'_sq_degrees/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
-i_Xi_std_dev_all_maps_vec = np.loadtxt(str(sq_degrees)+'_sq_degrees/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(2))
-i_Xi_std_dev_mean_all_maps_vec = np.loadtxt(str(sq_degrees)+'_sq_degrees/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(3))
+theta_mean_all_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(0)) # in arcmins
+i_Xi_mean_all_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
+i_Xi_std_dev_all_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(2))
+i_Xi_std_dev_mean_all_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_Xi_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(3))
 
 
 plt.figure(figsize=(9,9))
 plt.plot(theta_scale_vec, i_Xi_vec, c='r', label='theoretical i_Xi(theta)')
 plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_all_maps_vec, marker=10, label='i_Xi - one map error')
 plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_mean_all_maps_vec, marker=10, color='k', label='i_Xi - mean error')
-plt.xlim(1,400)
+plt.xlim(1,150)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
 plt.xscale('log')
@@ -350,7 +352,7 @@ plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_Xi_lognormal_theoretic
 ####################################
 plt.figure(figsize=(9,9))
 plt.scatter(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec/i_Xi_vec)
-plt.xlim(1,400)
+plt.xlim(1,150)
 plt.ylim(0,5)
 plt.xscale('log')
 plt.axhline(1, linestyle='dashed')

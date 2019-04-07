@@ -120,7 +120,7 @@ for j in range(maps_count):
     i_Xi_mean_one_map_vec = i_Xi_mean_one_map_vec/patch_count - mean_del_g_mean_one_map_vec/patch_count * xi_mean_one_map_vec/patch_count # for smaller errors
 
     # plot i_Xi of each map as a scatter plot
-    plt.scatter(theta_mean_one_map_vec, i_Xi_mean_one_map_vec)
+    #plt.scatter(theta_mean_one_map_vec, i_Xi_mean_one_map_vec)
 
     theta_mean_all_maps_vec = theta_mean_all_maps_vec +theta_mean_one_map_vec
     i_Xi_mean_all_maps_vec = i_Xi_mean_all_maps_vec + i_Xi_mean_one_map_vec
@@ -187,7 +187,7 @@ np.savetxt(filepath+'plot_output/i_Xi_simulations_gaussian_'+str(maps_count)+'_m
 plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_all_maps_vec, marker=10, label='i_Xi - one map error')
 plt.errorbar(theta_mean_all_maps_vec, i_Xi_mean_all_maps_vec, yerr=i_Xi_std_dev_mean_all_maps_vec, marker=10, color='k', label='i_Xi - mean error')
 #plt.plot(theta_mean_one_map_vec, w_theta(theta_mean_one_map_vec/60*np.pi/180), c='r', label='theoretical w(theta)')
-plt.xlim(1,400)
+plt.xlim(1,150)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
 plt.xscale('log')
