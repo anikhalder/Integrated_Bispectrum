@@ -17,9 +17,9 @@ def createFolder(directory):
 # therefore, we finally take l values from l=0 to l=8192 (and corresponding cl)
 
 def read_cl():
-    l = np.loadtxt('../data/Cell_data-f1z1f1z1.dat', usecols=(0))
+    l = np.loadtxt('../../data/Cell_data-f1z1f1z1.dat', usecols=(0))
     l = np.append(np.array([0.0,1.0]), l[:8191])
-    cl = np.loadtxt('../data/Cell_data-f1z1f1z1.dat', usecols=(1))
+    cl = np.loadtxt('../../data/Cell_data-f1z1f1z1.dat', usecols=(1))
     cl = np.append(np.array([0.0,0.0]), cl[:8191])
     return l, cl
 
