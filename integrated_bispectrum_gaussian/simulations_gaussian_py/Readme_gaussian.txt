@@ -4,9 +4,9 @@ Instructions:
 
 2. Depending on the size patch you need in each map - execute the following 3 python files:
 
-A_healpy_patches_producer_gaussian_delg.py <sq_degrees_patch>
-B_treecorr_patches_correlator_gaussian_delg.py <sq_degrees_patch>
-C_patches_analyser_gaussian_delg.py <sq_degrees_patch>
+A_healpy_patches_producer_gaussian_del.py <sq_degrees_patch>
+B_treecorr_patches_correlator_gaussian_del.py <sq_degrees_patch>
+C_patches_analyser_gaussian_del.py <sq_degrees_patch>
 
 
 
