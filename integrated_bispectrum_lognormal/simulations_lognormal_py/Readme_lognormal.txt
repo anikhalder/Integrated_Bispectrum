@@ -16,7 +16,7 @@ C_patches_analyser_lognormal_del.py <sq_degrees_patch>
 sq_degrees = 250
 patch_radius = 0.155 #rad
 patch_count = 20
-filepath = '../output/250_sq_degrees_20_patches/'
+filepath = '../simulations_output/250_sq_degrees_20_patches/'
 maps_count = 10
 
 
@@ -25,7 +25,7 @@ maps_count = 10
 sq_degrees = 50
 patch_radius = 0.069 #rad
 patch_count = 100
-filepath = '../output/50_sq_degrees_100_patches/'
+filepath = '../simulations_output/50_sq_degrees_100_patches/'
 maps_count = 10
 
 
@@ -34,7 +34,7 @@ maps_count = 10
 sq_degrees = 10
 patch_radius = 0.031 #rad
 patch_count = 500
-filepath = '../output/10_sq_degrees_500_patches/'
+filepath = '../simulations_output/10_sq_degrees_500_patches/'
 maps_count = 10
 
 

@@ -332,8 +332,8 @@ i_zeta_std_dev_mean_all_maps_vec = np.loadtxt('../simulations_output/'+str(sq_de
 
 plt.figure(figsize=(9,9))
 plt.plot(theta_scale_vec, i_zeta_vec, c='r', label='theoretical $i\\zeta(\\theta)$')
-plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_all_maps_vec, marker=10, label='i_zeta - one map error')
-plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_mean_all_maps_vec, marker=10, color='k', label='i_zeta - mean error')
+plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_all_maps_vec, marker=10, label='$i\\zeta$ - one map error')
+plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_mean_all_maps_vec, marker=10, color='k', label='$i\\zeta$ - mean error')
 plt.xlim(1,150)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
