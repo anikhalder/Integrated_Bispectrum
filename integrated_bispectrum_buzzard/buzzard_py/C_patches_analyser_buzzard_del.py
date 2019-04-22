@@ -58,9 +58,9 @@ filepath = '../buzzard_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+
 
 ################################################################
 
-plt.figure(figsize=(9,9))
+plt.figure(figsize=(10,10))
 
-# Compute mean of theta and i_zeta over all patches in the buuzard map
+# Compute mean of theta and i_zeta over all patches in the buzzard map
 theta_vec = np.loadtxt(filepath+'buzzard_map/B_treecorr_patches_correlated/correlation_buzzard_patch_'+str(1)+'.txt', usecols=(0)) # in arcmins
 
 filepath_map = filepath+'buzzard_map/'  
@@ -86,7 +86,7 @@ for i in range(patch_count):
 # individual map vector
 theta_mean_buzzard_map_vec = theta_mean_buzzard_map_vec/patch_count
 i_zeta_mean_buzzard_map_vec = i_zeta_mean_buzzard_map_vec/patch_count 
-#i_zeta_mean_buzzard_map_vec = i_zeta_mean_buzzard_map_vec/patch_count - mean_del_mean_buzzard_map_vec/patch_count * w_mean_buzzard_map_vec/patch_count # for smaller errors
+#i_zeta_mean_buzzard_map_vec = i_zeta_mean_buzzard_map_vec/patch_count - mean_del_mean_buzzard_map_vec/patch_count * w_mean_buzzard_map_vec/patch_count # for smaller errors (doesn't change much)
 
 # plot i_zeta of buzzard map as a scatter plot
 #plt.scatter(theta_mean_buzzard_map_vec, i_zeta_mean_buzzard_map_vec)
@@ -106,26 +106,29 @@ for i in range(patch_count):
 
 i_zeta_variance_buzzard_map_vec = i_zeta_variance_buzzard_map_vec/(patch_count-1)
 i_zeta_std_dev_buzzard_map_vec = np.sqrt(i_zeta_variance_buzzard_map_vec) # y-error
+i_zeta_std_dev_mean_buzzard_map_vec = i_zeta_std_dev_buzzard_map_vec / np.sqrt(patch_count) # y-error
 
 # -----------------------------------------------------------------------------------
 
 createFolder(filepath+'plot_output/')
 
-dat = np.array([theta_mean_buzzard_map_vec, i_zeta_mean_buzzard_map_vec, i_zeta_std_dev_buzzard_map_vec])
+dat = np.array([theta_mean_buzzard_map_vec, i_zeta_mean_buzzard_map_vec, i_zeta_std_dev_buzzard_map_vec, i_zeta_std_dev_mean_buzzard_map_vec])
 dat = dat.T
 np.savetxt(filepath+'plot_output/i_zeta_buzzard_map_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', dat, delimiter = ' ')
 
-plt.errorbar(theta_mean_buzzard_map_vec, i_zeta_mean_buzzard_map_vec, yerr=i_zeta_std_dev_buzzard_map_vec, marker=10, label='$i\\zeta$ - Buzzard map error')
-plt.xlim(1,150)
+plt.errorbar(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:], yerr=i_zeta_std_dev_buzzard_map_vec[1:], marker=10, label='$i\\zeta$ - one patch error')
+plt.errorbar(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:], yerr=i_zeta_std_dev_mean_buzzard_map_vec[1:], marker=10,  color='k', label='$i\\zeta$ - mean patches error')
+plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
 plt.xscale('log')
 #plt.yscale('log')
 plt.axhline(0, linestyle='dashed')
-plt.xlabel('Angle, $\\theta$ (arcmins)', fontsize=14)
-plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=14)
-plt.title('$i\\zeta$ of Buzzard map - '+str(patch_count)+' patches ('+str(sq_degrees)+' sq. degrees each patch)')
-plt.legend(fontsize=13)
+plt.xlabel('Angle, $\\theta$ (arcmins)', fontsize=16)
+plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=16)
+plt.tick_params(labelsize=16)
+plt.title('$i\\zeta$ of buzzard map - '+str(patch_count)+' patches ('+str(sq_degrees)+' sq. degrees each patch)', fontsize=14)
+plt.legend(loc='best', fontsize=14)
 plt.savefig(filepath+'plot_output/i_zeta_buzzard_map_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.pdf')
 
 end = time.time()
