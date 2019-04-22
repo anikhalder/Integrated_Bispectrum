@@ -82,7 +82,7 @@ def w_theta(theta):
     w = np.polynomial.legendre.legval(x, coeff)
     return w     
 
-plt.figure(figsize=(9,9))
+plt.figure(figsize=(10,10))
 
 # -----------------------------------------------------------------------------------
 # Compute mean of theta and i_zeta over all maps
@@ -101,7 +101,6 @@ for j in range(maps_count):
     i_zeta_mean_one_map_vec = np.zeros(theta_vec.size)
 
     for i in range(patch_count):
-        #print('Patch # '+str(i+1))
         # read individual map's treecorr data
         theta_vec = np.loadtxt(filepath_map+'B_treecorr_patches_correlated/correlation_gaussian_patch_'+str(i+1)+'.txt', usecols=(0)) # in arcmins
         w_vec = np.loadtxt(filepath_map+'B_treecorr_patches_correlated/correlation_gaussian_patch_'+str(i+1)+'.txt', usecols=(1)) # w(theta)
@@ -187,17 +186,18 @@ np.savetxt(filepath+'plot_output/i_zeta_simulations_gaussian_'+str(maps_count)+'
 plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_all_maps_vec, marker=10, label='$i\\zeta$ - one map error')
 plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_mean_all_maps_vec, marker=10, color='k', label='$i\\zeta$ - mean error')
 #plt.plot(theta_mean_one_map_vec, w_theta(theta_mean_one_map_vec/60*np.pi/180), c='r', label='theoretical $w(\\theta)$')
-plt.xlim(1,150)
+plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
 plt.xscale('log')
 #plt.yscale('log')
 plt.axhline(0, linestyle='dashed')
-plt.xlabel('Angle, $\\theta$ (arcmins)', fontsize=14)
-plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=14)
-plt.title('$i\\zeta$ of Gaussian field - '+str(maps_count)+' maps with each map '+str(patch_count)+' patches ('+str(sq_degrees)+' sq. degrees each patch)')
-plt.legend(fontsize=13)
-plt.savefig(filepath+'plot_output/i_zeta_gaussian_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.pdf')
+plt.xlabel('Angle, $\\theta$ (arcmins)', fontsize=16)
+plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=16)
+plt.tick_params(labelsize=16)
+plt.title('$i\\zeta$ of gaussian field - '+str(maps_count)+' maps with each map '+str(patch_count)+' patches ('+str(sq_degrees)+' sq. degrees each patch)', fontsize=14)
+plt.legend(loc='best', fontsize=14)
+plt.savefig(filepath+'plot_output/i_zeta_gaussian_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees_with_scatter.pdf')
 
 end = time.time()
 print('\nANALYSIS --> Time taken for execution (seconds): ', end - start)
