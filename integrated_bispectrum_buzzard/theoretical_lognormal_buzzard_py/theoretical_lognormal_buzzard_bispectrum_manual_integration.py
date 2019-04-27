@@ -20,6 +20,7 @@ if (sys.argv[1] == str(250)):
     #patch_radius = 0.155 #rad
     patch_count = 20
     #filepath = '../buzzard_output/250_sq_degrees_20_patches/'
+    maps_count = 10
 
 elif (sys.argv[1] == str(50)):
     ### Parameters to change according to patch size and count
@@ -28,6 +29,7 @@ elif (sys.argv[1] == str(50)):
     #patch_radius = 0.069 #rad
     patch_count = 100
     #filepath = '../buzzard_output/50_sq_degrees_100_patches/'
+    maps_count = 10
 
 elif (sys.argv[1] == str(10)):
     ### Parameters to change according to patch size and count
@@ -36,6 +38,7 @@ elif (sys.argv[1] == str(10)):
     #patch_radius = 0.031 #rad
     patch_count = 500
     #filepath = '../buzzard_output/10_sq_degrees_500_patches/'
+    maps_count = 10
 
 elif (sys.argv[1] == str(5)):
     ### Parameters to change according to patch size and count
@@ -44,7 +47,8 @@ elif (sys.argv[1] == str(5)):
     #patch_radius = 0.022 #rad
     patch_count = 1000
     #filepath = '../buzzard_output/5_sq_degrees_1000_patches/'
-    
+    maps_count = 10
+
 else:
 	raise Exception('Choose correct patch size!')
 
@@ -69,9 +73,10 @@ N = 10000 # number of evaluations for the integral
 # therefore, we finally take l values from l=0 to l=8192 (and corresponding cl)
 
 def read_cl():
-    l = np.loadtxt('../../data/Buzzard_data/Cell_halomodel.dat', usecols=(0))
-    cl = np.loadtxt('../../data/Buzzard_data/Cell_halomodel.dat', usecols=(1))
-
+    l = np.loadtxt('../../data/Buzzard_data/Cell_data-f1z1f1z1.dat', usecols=(0))
+    l = np.append(np.array([0.0,1.0]), l[:8191])
+    cl = np.loadtxt('../../data/Buzzard_data/Cell_data-f1z1f1z1.dat', usecols=(1))
+    cl = np.append(np.array([0.0,0.0]), cl[:8191])
     return l, cl
 
 l , cl = read_cl()
@@ -314,18 +319,25 @@ plt.title('Integrated 3-pt function of lognormal field ('+str(sq_degrees)+' sq. 
 plt.legend(loc='best', fontsize=14)
 plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_zeta_theoretical_lognormal_buzzard_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
 
-####################################
-# Theoretical & buzzard i_zeta plot
-####################################
+########################################################################
+# Theoretical, simulated lognormal & buzzard i_zeta plot
+########################################################################
 theta_mean_buzzard_map_vec = np.loadtxt('../buzzard_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_buzzard_map_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(0)) # in arcmins
 i_zeta_mean_buzzard_map_vec = np.loadtxt('../buzzard_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_buzzard_map_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
 i_zeta_std_dev_buzzard_map_vec = np.loadtxt('../buzzard_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_buzzard_map_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(2))
 i_zeta_std_dev_mean_buzzard_map_vec = np.loadtxt('../buzzard_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_buzzard_map_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(3))
 
+theta_mean_all_lognormal_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(0)) # in arcmins
+i_zeta_mean_all_lognormal_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(1))
+i_zeta_std_dev_all_lognormal_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(2))
+i_zeta_std_dev_mean_all_lognormal_maps_vec = np.loadtxt('../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', usecols=(3))
+
 plt.figure(figsize=(10,10))
 plt.plot(theta_scale_vec[1:], i_zeta_vec[1:], c='r', label='theoretical lognormal $i\\zeta(\\theta)$')
-plt.errorbar(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:], yerr=i_zeta_std_dev_buzzard_map_vec[1:], marker=10, label='$i\\zeta$ - one patch error')
-plt.errorbar(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:], yerr=i_zeta_std_dev_mean_buzzard_map_vec[1:], marker=10, color='k', label='$i\\zeta$ - mean patches error')
+plt.errorbar(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:], yerr=i_zeta_std_dev_buzzard_map_vec[1:], marker=10, label='$i\\zeta$ - one buzzard patch error')
+plt.errorbar(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:], yerr=i_zeta_std_dev_mean_buzzard_map_vec[1:], marker=10, color='k', label='$i\\zeta$ - mean buzzard patches error')
+plt.errorbar(theta_mean_all_lognormal_maps_vec[1:], i_zeta_mean_all_lognormal_maps_vec[1:], yerr=i_zeta_std_dev_all_lognormal_maps_vec[1:], marker=10, label='$i\\zeta$ - one lognormal map error')
+plt.errorbar(theta_mean_all_lognormal_maps_vec[1:], i_zeta_mean_all_lognormal_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_lognormal_maps_vec[1:], marker=10, color='g', label='$i\\zeta$ - mean lognormal maps error')
 plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)

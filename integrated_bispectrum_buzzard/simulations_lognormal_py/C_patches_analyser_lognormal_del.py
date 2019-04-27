@@ -120,7 +120,7 @@ for j in range(maps_count):
     i_zeta_mean_one_map_vec = i_zeta_mean_one_map_vec/patch_count - mean_del_mean_one_map_vec/patch_count * w_mean_one_map_vec/patch_count # for smaller errors
 
     # plot i_zeta of each map as a scatter plot
-    #plt.scatter(theta_mean_one_map_vec, i_zeta_mean_one_map_vec)
+    #plt.scatter(theta_mean_one_map_vec[1:], i_zeta_mean_one_map_vec[1:])
 
     theta_mean_all_maps_vec = theta_mean_all_maps_vec +theta_mean_one_map_vec
     i_zeta_mean_all_maps_vec = i_zeta_mean_all_maps_vec + i_zeta_mean_one_map_vec
@@ -185,7 +185,7 @@ np.savetxt(filepath+'plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+
 
 #plt.scatter(theta_mean_one_map_vec, i_zeta_mean_vec, c='b', marker=10, label='$i\\zeta$')
 plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_all_maps_vec[1:], marker=10, label='$i\\zeta$ - one map error')
-plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_maps_vec[1:], marker=10, color='k', label='$i\\zeta$ - mean error')
+plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_maps_vec[1:], marker=10, color='g', label='$i\\zeta$ - mean error')
 #plt.plot(theta_mean_one_map_vec, w_theta(theta_mean_one_map_vec/60*np.pi/180), c='r', label='theoretical $w(\\theta)$')
 plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
