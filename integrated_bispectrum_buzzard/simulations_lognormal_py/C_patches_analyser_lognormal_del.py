@@ -67,9 +67,9 @@ filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_cou
 # therefore, we finally take l values from l=0 to l=8192 (and corresponding cl)
 
 def read_cl():
-    l = np.loadtxt('../../data/Cell_data-f1z1f1z1.dat', usecols=(0))
+    l = np.loadtxt('../../data/Buzzard_data/Cell_data-f1z1f1z1.dat', usecols=(0))
     l = np.append(np.array([0.0,1.0]), l[:8191])
-    cl = np.loadtxt('../../data/Cell_data-f1z1f1z1.dat', usecols=(1))
+    cl = np.loadtxt('../../data/Buzzard_data/Cell_data-f1z1f1z1.dat', usecols=(1))
     cl = np.append(np.array([0.0,0.0]), cl[:8191])
     return l, cl
 
@@ -184,8 +184,8 @@ dat = dat.T
 np.savetxt(filepath+'plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees.txt', dat, delimiter = ' ')
 
 #plt.scatter(theta_mean_one_map_vec, i_zeta_mean_vec, c='b', marker=10, label='$i\\zeta$')
-plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_all_maps_vec, marker=10, label='$i\\zeta$ - one map error')
-plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_mean_all_maps_vec, marker=10, color='k', label='$i\\zeta$ - mean error')
+plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_all_maps_vec[1:], marker=10, label='$i\\zeta$ - one map error')
+plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_maps_vec[1:], marker=10, color='k', label='$i\\zeta$ - mean error')
 #plt.plot(theta_mean_one_map_vec, w_theta(theta_mean_one_map_vec/60*np.pi/180), c='r', label='theoretical $w(\\theta)$')
 plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
