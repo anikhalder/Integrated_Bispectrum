@@ -64,6 +64,8 @@ def calculate_patch_area(patch_radius):
 patch_radius = calculate_patch_radius(float(sys.argv[1]))
 filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/'
 
+createFolder(filepath)
+
 ################################################################
 
 
