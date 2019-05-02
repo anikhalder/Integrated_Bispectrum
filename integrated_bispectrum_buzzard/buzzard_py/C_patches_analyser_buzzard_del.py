@@ -89,7 +89,7 @@ theta_mean_buzzard_map_vec = theta_mean_buzzard_map_vec/patch_count
 i_zeta_mean_buzzard_map_vec = i_zeta_mean_buzzard_map_vec/patch_count - mean_del_mean_buzzard_map_vec/patch_count * w_mean_buzzard_map_vec/patch_count # for smaller errors 
 
 # plot i_zeta of buzzard map as a scatter plot
-#plt.scatter(theta_mean_buzzard_map_vec, i_zeta_mean_buzzard_map_vec)
+#plt.scatter(theta_mean_buzzard_map_vec[1:], i_zeta_mean_buzzard_map_vec[1:])
 
 # -----------------------------------------------------------------------------------
 # Compute variance of i_zeta over all patches in the buzzard map
