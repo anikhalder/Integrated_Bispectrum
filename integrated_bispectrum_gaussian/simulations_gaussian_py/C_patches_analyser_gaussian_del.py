@@ -62,26 +62,6 @@ filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_cou
 
 ################################################################
 
-# as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
-# we also take only till l=8192 (before index 8191) for flask simulation
-# therefore, we finally take l values from l=0 to l=8192 (and corresponding cl)
-
-def read_cl():
-    l = np.loadtxt('../../data/Cell_data-f1z1f1z1.dat', usecols=(0))
-    l = np.append(np.array([0.0,1.0]), l[:8191])
-    cl = np.loadtxt('../../data/Cell_data-f1z1f1z1.dat', usecols=(1))
-    cl = np.append(np.array([0.0,0.0]), cl[:8191])
-    return l, cl
-
-l , cl = read_cl()
-
-# Theoretical angular correlation function (using formula with Legendre polynomials)
-def w_theta(theta):
-    x = np.cos(theta)
-    coeff = (2*l+1)/(4*np.pi)*cl
-    w = np.polynomial.legendre.legval(x, coeff)
-    return w     
-
 plt.figure(figsize=(10,10))
 
 # -----------------------------------------------------------------------------------
@@ -185,7 +165,6 @@ np.savetxt(filepath+'plot_output/i_zeta_simulations_gaussian_'+str(maps_count)+'
 #plt.scatter(theta_mean_one_map_vec, i_zeta_mean_vec, c='b', marker=10, label='$i\\zeta$')
 plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_all_maps_vec, marker=10, label='$i\\zeta$ - one map error')
 plt.errorbar(theta_mean_all_maps_vec, i_zeta_mean_all_maps_vec, yerr=i_zeta_std_dev_mean_all_maps_vec, marker=10, color='k', label='$i\\zeta$ - mean error')
-#plt.plot(theta_mean_one_map_vec, w_theta(theta_mean_one_map_vec/60*np.pi/180), c='r', label='theoretical $w(\\theta)$')
 plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)

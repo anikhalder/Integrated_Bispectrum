@@ -62,26 +62,6 @@ filepath = '../simulations_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_cou
 
 ################################################################
 
-# as l=0 and l=1 (and corresponding cl values of 0) are missing due to requirement of flask, we append them
-# we also take only till l=8192 (before index 8191) for flask simulation
-# therefore, we finally take l values from l=0 to l=8192 (and corresponding cl)
-
-def read_cl():
-    l = np.loadtxt('../../data/Mice_data/Cell_data-f1z1f1z1.dat', usecols=(0))
-    l = np.append(np.array([0.0,1.0]), l)
-    cl = np.loadtxt('../../data/Mice_data/Cell_data-f1z1f1z1.dat', usecols=(1))
-    cl = np.append(np.array([0.0,0.0]), cl)
-    return l, cl
-
-l , cl = read_cl()
-
-# Theoretical angular correlation function (using formula with Legendre polynomials)
-def w_theta(theta):
-    x = np.cos(theta)
-    coeff = (2*l+1)/(4*np.pi)*cl
-    w = np.polynomial.legendre.legval(x, coeff)
-    return w     
-
 plt.figure(figsize=(10,10))
 
 # -----------------------------------------------------------------------------------
@@ -120,7 +100,7 @@ for j in range(maps_count):
     i_zeta_mean_one_map_vec = i_zeta_mean_one_map_vec/patch_count - mean_del_mean_one_map_vec/patch_count * w_mean_one_map_vec/patch_count # for smaller errors
 
     # plot i_zeta of each map as a scatter plot
-    #plt.scatter(theta_mean_one_map_vec[1:], i_zeta_mean_one_map_vec[1:])
+    plt.scatter(theta_mean_one_map_vec[1:], i_zeta_mean_one_map_vec[1:])
 
     theta_mean_all_maps_vec = theta_mean_all_maps_vec +theta_mean_one_map_vec
     i_zeta_mean_all_maps_vec = i_zeta_mean_all_maps_vec + i_zeta_mean_one_map_vec
@@ -186,7 +166,6 @@ np.savetxt(filepath+'plot_output/i_zeta_simulations_lognormal_'+str(maps_count)+
 #plt.scatter(theta_mean_one_map_vec, i_zeta_mean_vec, c='b', marker=10, label='$i\\zeta$')
 plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_all_maps_vec[1:], marker=10, label='$i\\zeta$ - one map error')
 plt.errorbar(theta_mean_all_maps_vec[1:], i_zeta_mean_all_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_maps_vec[1:], marker=10, color='g', label='$i\\zeta$ - mean error')
-#plt.plot(theta_mean_one_map_vec, w_theta(theta_mean_one_map_vec/60*np.pi/180), c='r', label='theoretical $w(\\theta)$')
 plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
@@ -198,7 +177,7 @@ plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=16)
 plt.tick_params(labelsize=16)
 plt.title('$i\\zeta$ of lognormal field - '+str(maps_count)+' maps with each map '+str(patch_count)+' patches ('+str(sq_degrees)+' sq. degrees each patch)', fontsize=14)
 plt.legend(loc='best', fontsize=14)
-plt.savefig(filepath+'plot_output/i_zeta_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees_without_scatter.pdf')
+plt.savefig(filepath+'plot_output/i_zeta_lognormal_'+str(maps_count)+'_maps_'+str(patch_count)+'_patches_'+str(sq_degrees)+'_sq_degrees_with_scatter.pdf')
 
 end = time.time()
 print('\nANALYSIS --> Time taken for execution (seconds): ', end - start)
