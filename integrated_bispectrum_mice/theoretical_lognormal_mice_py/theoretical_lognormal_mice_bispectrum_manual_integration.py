@@ -74,9 +74,9 @@ N = 10000 # number of evaluations for the integral
 
 def read_cl():
     l = np.loadtxt('../../data/Mice_data/Cell_data-f1z1f1z1.dat', usecols=(0))
-    l = np.append(np.array([0.0,1.0]), l)
+    l = np.append(np.array([0.0,1.0]), l[:8191])
     cl = np.loadtxt('../../data/Mice_data/Cell_data-f1z1f1z1.dat', usecols=(1))
-    cl = np.append(np.array([0.0,0.0]), cl)
+    cl = np.append(np.array([0.0,0.0]), cl[:8191])
     return l, cl
 
 l , cl = read_cl()
