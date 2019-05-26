@@ -64,7 +64,7 @@ patch_radius = calculate_patch_radius(float(sys.argv[1]))
 filepath = '../mice_output/'+str(sq_degrees)+'_sq_degrees_'+str(patch_count)+'_patches/'
 
 ################################################################
-log_shift = 0.65 # log shift parameter
+log_shift = 0.819 # log shift parameter
 N = 10000 # number of evaluations for the integral
 ################################################################
 
@@ -315,7 +315,7 @@ plt.axhline(0, linestyle='dashed')
 plt.xlabel('Angle, $\\theta$ (arcmins)', fontsize=16)
 plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=16)
 plt.tick_params(labelsize=16)
-plt.title('Integrated 3-pt function of lognormal field ('+str(sq_degrees)+' sq. degrees patch) \n # of evaluations = '+str(N)+'; $\\delta_0$ = '+str(log_shift), fontsize=14)
+plt.title('Integrated 3-pt function of mice and theoretical lognormal model ('+str(sq_degrees)+' sq. degrees patch) \n # of evaluations = '+str(N)+'; $\\delta_0$ = '+str(log_shift), fontsize=14)
 plt.legend(loc='best', fontsize=14)
 plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_zeta_theoretical_lognormal_mice_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
 
@@ -336,8 +336,8 @@ plt.figure(figsize=(10,10))
 plt.plot(theta_scale_vec[1:], i_zeta_vec[1:], c='r', label='theoretical lognormal $i\\zeta(\\theta)$')
 plt.errorbar(theta_mean_mice_map_vec[1:], i_zeta_mean_mice_map_vec[1:], yerr=i_zeta_std_dev_mice_map_vec[1:], marker=10, label='$i\\zeta$ - one mice patch error')
 plt.errorbar(theta_mean_mice_map_vec[1:], i_zeta_mean_mice_map_vec[1:], yerr=i_zeta_std_dev_mean_mice_map_vec[1:], marker=10, color='k', label='$i\\zeta$ - mean mice patches error')
-plt.errorbar(theta_mean_all_lognormal_maps_vec[1:], i_zeta_mean_all_lognormal_maps_vec[1:], yerr=i_zeta_std_dev_all_lognormal_maps_vec[1:], marker=10, label='$i\\zeta$ - one lognormal map error')
-plt.errorbar(theta_mean_all_lognormal_maps_vec[1:], i_zeta_mean_all_lognormal_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_lognormal_maps_vec[1:], marker=10, color='g', label='$i\\zeta$ - mean lognormal maps error')
+#plt.errorbar(theta_mean_all_lognormal_maps_vec[1:], i_zeta_mean_all_lognormal_maps_vec[1:], yerr=i_zeta_std_dev_all_lognormal_maps_vec[1:], marker=10, label='$i\\zeta$ - one lognormal map error')
+#plt.errorbar(theta_mean_all_lognormal_maps_vec[1:], i_zeta_mean_all_lognormal_maps_vec[1:], yerr=i_zeta_std_dev_mean_all_lognormal_maps_vec[1:], marker=10, color='g', label='$i\\zeta$ - mean lognormal maps error')
 plt.xlim(1,200)
 #plt.ylim(1e-6, 1e-1)
 plt.ylim(-0.001, 0.02)
@@ -347,7 +347,7 @@ plt.axhline(0, linestyle='dashed')
 plt.xlabel('Angle, $\\theta$ (arcmins)', fontsize=16)
 plt.ylabel('Integrated 3-pt function, $i\\zeta(\\theta)$', fontsize=16)
 plt.tick_params(labelsize=16)
-plt.title('Integrated 3-pt function of lognormal field ('+str(sq_degrees)+' sq. degrees patch) \n # of evaluations = '+str(N)+'; $\\delta_0$ = '+str(log_shift), fontsize=14)
+plt.title('Integrated 3-pt function of of mice and theoretical lognormal model ('+str(sq_degrees)+' sq. degrees patch) \n # of evaluations = '+str(N)+'; $\\delta_0$ = '+str(log_shift), fontsize=14)
 plt.legend(loc='best', fontsize=14)
 plt.savefig(str(sq_degrees)+'_sq_degrees/'+str(N)+'_pts/i_zeta_lognormal_theoretical_mice_patch_'+str(sq_degrees)+'_sq_degrees.pdf')
 
